@@ -1126,6 +1126,8 @@ public:
    void addPeriodicBCs(const std::vector<Teuchos::RCP<const PeriodicBC_MatcherBase> > & bc_vec)
    { periodicBCs_.insert(periodicBCs_.end(),bc_vec.begin(),bc_vec.end()); }
 
+   /** Pairs DOFs on periodic entities 
+    */
    std::pair<Teuchos::RCP<std::vector<std::pair<std::size_t,std::size_t> > >, Teuchos::RCP<std::vector<unsigned int> > >
    getPeriodicNodePairing() const;
 
