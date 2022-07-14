@@ -1866,7 +1866,6 @@ STK_Interface::isMeshCoordField(const std::string & eBlock,
   return true;
 }
 
-#ifndef PANZER_HAVE_STKSEARCH
 std::pair<Teuchos::RCP<std::vector<std::pair<std::size_t,std::size_t> > >, Teuchos::RCP<std::vector<unsigned int> > >
 STK_Interface::getPeriodicNodePairing() const
 {
@@ -1905,34 +1904,6 @@ STK_Interface::getPeriodicNodePairing() const
 
    return std::make_pair(vec,type_vec);
 }
-#else
-std::pair<Teuchos::RCP<std::vector<std::pair<std::size_t,std::size_t> > >, Teuchos::RCP<std::vector<unsigned int> > >
-STK_Interface::getPeriodicNodePairing() const
-{
-   Teuchos::RCP<std::vector<std::pair<std::size_t,std::size_t> > > vec;
-   Teuchos::RCP<std::vector<unsigned int > > type_vec = rcp(new std::vector<unsigned int>);
-   const std::vector<Teuchos::RCP<const PeriodicBC_MatcherBase> > & matchers = getPeriodicBCVector();
-   std::vector<std::vector<std::string> > matchedSides(3); // (coord,edge,face)
-
-   // build up the vectors by looping over the matched pair
-   for(std::size_t m=0;m<matchers.size();m++){
-      unsigned int type;
-      if(matchers[m]->getType() == "coord")
-        type = 0;
-      else if(matchers[m]->getType() == "edge")
-        type = 1;
-      else if(matchers[m]->getType() == "face")
-        type = 2;
-      else
-        TEUCHOS_ASSERT(false);
-      vec = matchers[m]->getMatchedPair(*this,matchedSides[type],vec);
-      type_vec->insert(type_vec->begin(),vec->size()-type_vec->size(),type);
-      matchedSides[type].push_back(matchers[m]->getLeftSidesetName());
-   }
-
-   return std::make_pair(vec,type_vec);
-}
-#endif
 
 bool STK_Interface::validBlockId(const std::string & blockId) const
 {

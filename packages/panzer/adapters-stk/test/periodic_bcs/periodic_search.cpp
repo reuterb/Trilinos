@@ -2300,9 +2300,5 @@ namespace panzer {
     TEST_ASSERT(wm->isThreeD());
     TEST_EQUALITY(wm->getIndex(),0);
   }
-<<<<<<< HEAD
 }
 #endif
-=======
-}
->>>>>>> fc9db11d247 (Panzer: Source and tests for periodic bc refactor. Employs STKSearch.)
