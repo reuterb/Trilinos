@@ -170,7 +170,7 @@ void Quad8ToQuad4MeshFactory::setParameterList(const Teuchos::RCP<Teuchos::Param
    createEdgeBlocks_ = paramList->get<bool>("Create Edge Blocks");
 
    // read in periodic boundary conditions
-   parsePeriodicBCList(Teuchos::rcpFromRef(paramList->sublist("Periodic BCs")),periodicBCVec_);
+   parsePeriodicBCList(Teuchos::rcpFromRef(paramList->sublist("Periodic BCs")),periodicBCVec_,searchFlag_);
 }
 
 //! From ParameterListAcceptor
