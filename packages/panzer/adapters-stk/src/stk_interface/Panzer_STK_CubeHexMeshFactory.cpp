@@ -247,7 +247,7 @@ void CubeHexMeshFactory::setParameterList(const Teuchos::RCP<Teuchos::ParameterL
    }
 
    // read in periodic boundary conditions
-   parsePeriodicBCList(Teuchos::rcpFromRef(paramList->sublist("Periodic BCs")),periodicBCVec_);
+   parsePeriodicBCList(Teuchos::rcpFromRef(paramList->sublist("Periodic BCs")),periodicBCVec_,searchFlag_);
 }
 
 //! From ParameterListAcceptor

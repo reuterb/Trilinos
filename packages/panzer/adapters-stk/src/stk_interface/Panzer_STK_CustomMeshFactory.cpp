@@ -152,7 +152,7 @@ namespace panzer_stk {
     ElectricPotential_ = paramList->get<double*>("ElectricPotential");
 
     // read in periodic boundary conditions
-    parsePeriodicBCList(Teuchos::rcpFromRef(paramList->sublist("Periodic BCs")),periodicBCVec_);
+    parsePeriodicBCList(Teuchos::rcpFromRef(paramList->sublist("Periodic BCs")),periodicBCVec_,searchFlag_);
   }
 
   //! From ParameterListAcceptor

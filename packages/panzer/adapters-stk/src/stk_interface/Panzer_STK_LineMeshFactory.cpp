@@ -129,7 +129,7 @@ void LineMeshFactory::setParameterList(const Teuchos::RCP<Teuchos::ParameterList
    nXElems_ = paramList->get<int>("X Elements");
 
    // read in periodic boundary conditions
-   parsePeriodicBCList(Teuchos::rcpFromRef(paramList->sublist("Periodic BCs")),periodicBCVec_);
+   parsePeriodicBCList(Teuchos::rcpFromRef(paramList->sublist("Periodic BCs")),periodicBCVec_,searchFlag_);
 }
 
 //! From ParameterListAcceptor

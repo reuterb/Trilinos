@@ -40,6 +40,8 @@
 // ***********************************************************************
 // @HEADER
 
+#ifdef PANZER_HAVE_STKSEARCH
+
 #include <Teuchos_ConfigDefs.hpp>
 #include <Teuchos_UnitTestHarness.hpp>
 #include <Teuchos_RCP.hpp>
@@ -2299,3 +2301,4 @@ namespace panzer {
     TEST_EQUALITY(wm->getIndex(),0);
   }
 }
+#endif

@@ -1866,38 +1866,13 @@ STK_Interface::isMeshCoordField(const std::string & eBlock,
   return true;
 }
 
-#ifndef PANZER_HAVE_STKSEARCH
 std::pair<Teuchos::RCP<std::vector<std::pair<std::size_t,std::size_t> > >, Teuchos::RCP<std::vector<unsigned int> > >
 STK_Interface::getPeriodicNodePairing() const
 {
    Teuchos::RCP<std::vector<std::pair<std::size_t,std::size_t> > > vec;
    Teuchos::RCP<std::vector<unsigned int > > type_vec = rcp(new std::vector<unsigned int>);
    const std::vector<Teuchos::RCP<const PeriodicBC_MatcherBase> > & matchers = getPeriodicBCVector();
-
-   // build up the vectors by looping over the matched pair
-   for(std::size_t m=0;m<matchers.size();m++){
-      vec = matchers[m]->getMatchedPair(*this,vec);
-      unsigned int type;
-      if(matchers[m]->getType() == "coord")
-        type = 0;
-      else if(matchers[m]->getType() == "edge")
-        type = 1;
-      else if(matchers[m]->getType() == "face")
-        type = 2;
-      else
-        TEUCHOS_ASSERT(false);
-      type_vec->insert(type_vec->begin(),vec->size()-type_vec->size(),type);
-   }
-
-   return std::make_pair(vec,type_vec);
-}
-#else
-std::pair<Teuchos::RCP<std::vector<std::pair<std::size_t,std::size_t> > >, Teuchos::RCP<std::vector<unsigned int> > >
-STK_Interface::getPeriodicNodePairing() const
-{
-   Teuchos::RCP<std::vector<std::pair<std::size_t,std::size_t> > > vec;
-   Teuchos::RCP<std::vector<unsigned int > > type_vec = rcp(new std::vector<unsigned int>);
-   const std::vector<Teuchos::RCP<const PeriodicBC_MatcherBase> > & matchers = getPeriodicBCVector();
+   const bool & searchFlag = getPeriodicSearchFlag();
    std::vector<std::vector<std::string> > matchedSides(3); // (coord,edge,face)
 
    // build up the vectors by looping over the matched pair
@@ -1911,14 +1886,24 @@ STK_Interface::getPeriodicNodePairing() const
         type = 2;
       else
         TEUCHOS_ASSERT(false);
-      vec = matchers[m]->getMatchedPair(*this,matchedSides[type],vec);
+#ifdef PANZER_HAVE_STKSEARCH
+      // warning if we have the new flag on but dont have STKSEARCH enable?
+
+      // if new flag...
+      if (searchFlag) {
+         vec = matchers[m]->getMatchedPair(*this,matchedSides[type],vec);
+      } else {
+         vec = matchers[m]->getMatchedPair(*this,vec);
+      }
+#else 
+      vec = matchers[m]->getMatchedPair(*this,vec);
+#endif
       type_vec->insert(type_vec->begin(),vec->size()-type_vec->size(),type);
       matchedSides[type].push_back(matchers[m]->getLeftSidesetName());
    }
 
    return std::make_pair(vec,type_vec);
 }
-#endif
 
 bool STK_Interface::validBlockId(const std::string & blockId) const
 {
