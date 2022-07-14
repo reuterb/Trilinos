@@ -40,8 +40,6 @@
 // ***********************************************************************
 // @HEADER
 
-#ifdef PANZER_HAVE_STKSEARCH
-
 #include <Teuchos_ConfigDefs.hpp>
 #include <Teuchos_UnitTestHarness.hpp>
 #include <Teuchos_RCP.hpp>
@@ -75,6 +73,8 @@
 #include "Intrepid2_HCURL_HEX_I1_FEM.hpp"
 
 #include <string>
+
+#ifdef PANZER_HAVE_STKSEARCH
 
 typedef Kokkos::DynRankView<double,PHX::Device> FieldContainer;
 
@@ -2300,5 +2300,9 @@ namespace panzer {
     TEST_ASSERT(wm->isThreeD());
     TEST_EQUALITY(wm->getIndex(),0);
   }
+<<<<<<< HEAD
 }
 #endif
+=======
+}
+>>>>>>> fc9db11d247 (Panzer: Source and tests for periodic bc refactor. Employs STKSearch.)
