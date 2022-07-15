@@ -53,6 +53,7 @@
 
 #include "Teuchos_FancyOStream.hpp"
 
+#ifdef PANZER_HAVE_STKSEARCH
 namespace panzer_stk {
 
 namespace periodic_helpers {
@@ -358,3 +359,4 @@ void appendMapping(Teuchos::RCP<std::vector<std::pair<size_t,size_t> > > & curre
 } // end periodic_helpers
 
 } // end panzer_stk
+#endif

@@ -91,6 +91,7 @@ namespace panzer_stk {
     buildMetaData(*mesh);
 
     mesh->addPeriodicBCs(periodicBCVec_);
+    mesh->setPeriodicSearchFlag(searchFlag_);
 
     return mesh;
   }

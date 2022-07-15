@@ -141,6 +141,7 @@ Teuchos::RCP<STK_Interface> SquareQuadMeshFactory::buildUncommitedMesh(stk::Para
    buildMetaData(parallelMach,*mesh);
 
    mesh->addPeriodicBCs(periodicBCVec_);
+   mesh->setPeriodicSearchFlag(searchFlag_);
 
    return mesh;
 }

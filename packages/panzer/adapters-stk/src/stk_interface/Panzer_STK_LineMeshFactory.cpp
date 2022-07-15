@@ -91,6 +91,7 @@ Teuchos::RCP<STK_Interface> LineMeshFactory::buildUncommitedMesh(stk::ParallelMa
    buildMetaData(parallelMach,*mesh);
 
    mesh->addPeriodicBCs(periodicBCVec_);
+   mesh->setPeriodicSearchFlag(searchFlag_);
  
    return mesh;
 }

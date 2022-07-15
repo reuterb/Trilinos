@@ -188,6 +188,7 @@ Teuchos::RCP<STK_Interface> STK_ExodusReaderFactory::buildUncommitedMesh(stk::Pa
    buildMetaData(parallelMach, *mesh);
 
    mesh->addPeriodicBCs(periodicBCVec_);
+   mesh->setPeriodicSearchFlag(searchFlag_);
 
    return mesh;
 }

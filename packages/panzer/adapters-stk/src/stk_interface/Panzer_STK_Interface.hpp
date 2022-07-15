@@ -1115,6 +1115,10 @@ public:
    const bool & getPeriodicSearchFlag() const
    { return searchFlag_; }
 
+   /** Set the periodic search flag. Indicates if the bounding box search is used */
+   void setPeriodicSearchFlag(const bool & searchFlag)
+   { searchFlag_ = searchFlag; return; }
+
    /** Add a periodic boundary condition.
      *
      * \note This does not actually change the underlying mesh.
