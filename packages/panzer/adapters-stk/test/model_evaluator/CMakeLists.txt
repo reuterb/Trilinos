@@ -16,6 +16,13 @@ TRIBITS_ADD_EXECUTABLE_AND_TEST(
   )
 
 TRIBITS_ADD_EXECUTABLE_AND_TEST(
+  model_evaluator_tpetra
+  SOURCES model_evaluator_tpetra.cpp ${UNIT_TEST_DRIVER}
+  COMM serial mpi
+  NUM_MPI_PROCS 4
+  )
+
+TRIBITS_ADD_EXECUTABLE_AND_TEST(
   model_evaluator_mass_check
   SOURCES model_evaluator_mass_check.cpp ${UNIT_TEST_DRIVER}
   COMM serial mpi
