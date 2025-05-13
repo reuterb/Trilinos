@@ -1150,6 +1150,36 @@ void STK_Interface::getNeighborElements(const std::string & blockID,std::vector<
    stk::mesh::get_selected_entities(neighborBlock,bulkData_->buckets(elementRank),elements);
 }
 
+void STK_Interface::getMyElementRings(std::vector<std::pair<stk::mesh::Entity,std::vector<stk::mesh::Entity>>> & rings) const
+{
+   // get local elements
+   std::vector<stk::mesh::Entity> elements;
+   getMyElements(elements);
+
+   // entity ranks
+   stk::mesh::EntityRank elementRank = getElementRank();
+   stk::mesh::EntityRank nodeRank = getNodeRank();
+
+   for (const auto & elem : elements) {
+	   std::vector<stk::mesh::EntityId> elem_nodes;
+      std::set<stk::mesh::Entity> element_ring_set;
+      getNodeIdsForElement(elem,elem_nodes);
+
+      for (const auto & node : elem_nodes){
+         std::vector<stk::mesh::Entity> elements_sharing_node;
+         getElementsSharingNode(node,elements_sharing_node);
+
+         for(unsigned int ielem = 0; ielem < elements_sharing_node.size(); ++ielem)
+            element_ring_set.insert(elements_sharing_node[ielem]);
+      }
+      std::vector<stk::mesh::Entity> element_ring(element_ring_set.begin(),element_ring_set.end());
+      std::pair<stk::mesh::Entity,std::vector<stk::mesh::Entity>> center_and_ring;
+      center_and_ring.first = elem;
+      center_and_ring.second = element_ring;
+      rings.push_back(center_and_ring);
+   }
+}
+
 void STK_Interface::getMyEdges(std::vector<stk::mesh::Entity> & edges) const
 {
    // setup local ownership

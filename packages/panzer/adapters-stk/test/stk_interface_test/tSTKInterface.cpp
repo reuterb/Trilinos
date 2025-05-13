@@ -24,7 +24,7 @@ namespace panzer_stk {
 
 typedef shards::Quadrilateral<4> QuadTopo;
 
-Teuchos::RCP<STK_Interface> build2DMesh()
+Teuchos::RCP<STK_Interface> build2DMesh(bool require_one_ring=false)
 {
    const CellTopologyData * ctd = shards::getCellTopologyData<QuadTopo>();
    const CellTopologyData * side_ctd = shards::CellTopology(ctd).getBaseCellTopologyData(1,0);
@@ -122,6 +122,151 @@ Teuchos::RCP<STK_Interface> build2DMesh()
 
          Teuchos::RCP<ElementDescriptor> ed = buildElementDescriptor(3,nodes);
          mesh.addElement(ed,block);
+      }
+
+      if (require_one_ring) {
+
+         {
+            // Add four coordinates
+            //
+            //    7 ---- 9
+            //    |      |
+            //    |      |
+            //    3 ---- 6
+            //
+
+            coord[0] = 2.0; coord[1] = 2.5;
+            mesh.addNode(9,coord);
+
+            // add an element
+            std::vector<stk::mesh::EntityId> nodes(4);
+            nodes[0] = 3;
+            nodes[1] = 6;
+            nodes[2] = 9;
+            nodes[3] = 7;
+
+            Teuchos::RCP<ElementDescriptor> ed = buildElementDescriptor(4,nodes);
+            mesh.addElement(ed,block);
+         }
+
+         {
+            // Add four coordinates
+            //
+            //    2 ---- 5
+            //    |      |
+            //    |      |
+            //    11 ---- 10
+            //
+
+            coord[0] = 2.0; coord[1] = -1.0;
+            mesh.addNode(10,coord);
+            coord[0] = 1.0; coord[1] = -1.0;
+            mesh.addNode(11,coord);
+
+            // add an element
+            std::vector<stk::mesh::EntityId> nodes(4);
+            nodes[0] = 11;
+            nodes[1] = 10;
+            nodes[2] = 5;
+            nodes[3] = 2;
+
+            Teuchos::RCP<ElementDescriptor> ed = buildElementDescriptor(5,nodes);
+            mesh.addElement(ed,block);
+         }
+
+         {
+            // Add four coordinates
+            //
+            //    1 ---- 2
+            //    |      |
+            //    |      |
+            //    12 ---- 11
+            //
+
+            coord[0] = 0.0; coord[1] = -1.0;
+            mesh.addNode(12,coord);
+
+            // add an element
+            std::vector<stk::mesh::EntityId> nodes(4);
+            nodes[0] = 12;
+            nodes[1] = 11;
+            nodes[2] = 2;
+            nodes[3] = 1;
+
+            Teuchos::RCP<ElementDescriptor> ed = buildElementDescriptor(6,nodes);
+            mesh.addElement(ed,block);
+         }
+
+         {
+            // Add four coordinates
+            //
+            //    14 ---- 1
+            //    |      |
+            //    |      |
+            //    13 ---- 12
+            //
+
+            coord[0] = -0.5; coord[1] = -0.5;
+            mesh.addNode(13,coord);
+            coord[0] = -0.5; coord[1] = 0.5;
+            mesh.addNode(14,coord);
+
+            // add an element
+            std::vector<stk::mesh::EntityId> nodes(4);
+            nodes[0] = 13;
+            nodes[1] = 12;
+            nodes[2] = 1;
+            nodes[3] = 14;
+
+            Teuchos::RCP<ElementDescriptor> ed = buildElementDescriptor(7,nodes);
+            mesh.addElement(ed,block);
+         }
+
+         {
+            // Add four coordinates
+            //
+            //    15 ---- 4
+            //    |      |
+            //    |      |
+            //    14 ---- 1
+            //
+
+            coord[0] = -0.5; coord[1] = 1.0;
+            mesh.addNode(15,coord);
+
+            // add an element
+            std::vector<stk::mesh::EntityId> nodes(4);
+            nodes[0] = 14;
+            nodes[1] = 1;
+            nodes[2] = 4;
+            nodes[3] = 15;
+
+            Teuchos::RCP<ElementDescriptor> ed = buildElementDescriptor(8,nodes);
+            mesh.addElement(ed,block);
+         }
+
+         {
+            // Add four coordinates
+            //
+            //    16 ---- 8
+            //    |      |
+            //    |      |
+            //    15 ---- 4
+            //
+
+            coord[0] = -0.5; coord[1] = 2.5;
+            mesh.addNode(16,coord);
+
+            // add an element
+            std::vector<stk::mesh::EntityId> nodes(4);
+            nodes[0] = 15;
+            nodes[1] = 4;
+            nodes[2] = 8;
+            nodes[3] = 16;
+
+            Teuchos::RCP<ElementDescriptor> ed = buildElementDescriptor(9,nodes);
+            mesh.addElement(ed,block);
+         }
       }
 
    mesh.endModification();
@@ -521,5 +666,70 @@ TEUCHOS_UNIT_TEST(tSTKInterface, globalVariables)
     physicsFavoritesFromFileA(physicsFavoritesFromFile);
   TEST_EQUALITY(physicsFavoritesA, physicsFavoritesFromFileA)
 } // end of tSTKInterface_globalVariables_UnitTest
+
+TEUCHOS_UNIT_TEST(tSTKInterface, get_element_rings)
+{
+   using Teuchos::RCP;
+   using Teuchos::rcp;
+   using Teuchos::rcpFromRef;
+
+   RCP<STK_Interface> mesh = build2DMesh(true /*require_one_ring*/);
+   // The mesh is constructed so that element 1 has a one ring of elements
+   std::vector<std::pair<stk::mesh::Entity,std::vector<stk::mesh::Entity>>> rings;
+
+   mesh->getMyElementRings(rings);
+
+#define CHECK_ELEM_IN_RING(id) { \
+TEST_ASSERT(std::find_if(elems_in_ring.begin(),elems_in_ring.end(),CompareID(mesh, id))!=elems_in_ring.end()); }
+
+   // check a few element rings
+   for (const auto & ring : rings) {
+      const auto elems_in_ring = ring.second;
+      // center element should have all elements in ring
+      if (mesh->elementGlobalId(ring.first) == 1) {
+         TEST_ASSERT(elems_in_ring.size()==9);
+         for (int ielem=1; ielem<10; ++ielem)
+            CHECK_ELEM_IN_RING(ielem)
+      }
+      // top right element should have four elements in ring
+      if (mesh->elementGlobalId(ring.first) == 4) {
+         TEST_ASSERT(elems_in_ring.size()==4);
+         CHECK_ELEM_IN_RING(4)
+         CHECK_ELEM_IN_RING(2)
+         CHECK_ELEM_IN_RING(3)
+         CHECK_ELEM_IN_RING(1)
+      }
+      // middle left element should have 6 elements in ring
+      if (mesh->elementGlobalId(ring.first) == 8) {
+         TEST_ASSERT(elems_in_ring.size()==6);
+         CHECK_ELEM_IN_RING(8)
+         CHECK_ELEM_IN_RING(1)
+         CHECK_ELEM_IN_RING(3)
+         CHECK_ELEM_IN_RING(9)
+         CHECK_ELEM_IN_RING(7)
+         CHECK_ELEM_IN_RING(6)
+      }
+      // bottom middle element should have 6 elements in ring
+      if (mesh->elementGlobalId(ring.first) == 6) {
+         TEST_ASSERT(elems_in_ring.size()==6);
+         CHECK_ELEM_IN_RING(6)
+         CHECK_ELEM_IN_RING(1)
+         CHECK_ELEM_IN_RING(2)
+         CHECK_ELEM_IN_RING(5)
+         CHECK_ELEM_IN_RING(7)
+         CHECK_ELEM_IN_RING(8)
+      }
+      // top right element should have 4 elements in ring
+      if (mesh->elementGlobalId(ring.first) == 9) {
+         TEST_ASSERT(elems_in_ring.size()==4);
+         CHECK_ELEM_IN_RING(9)
+         CHECK_ELEM_IN_RING(1)
+         CHECK_ELEM_IN_RING(3)
+         CHECK_ELEM_IN_RING(8)
+      }
+   }
+#undef CHECK_ELEM_IN_RING
+
+}
 
 }

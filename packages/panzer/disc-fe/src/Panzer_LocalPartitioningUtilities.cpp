@@ -378,6 +378,72 @@ buildGhostedCellOneRing(const Teuchos::RCP<const Teuchos::Comm<int> > & comm,
   return ghstd_cells;
 }
 
+/** Build one rings for all cells
+  */
+//?? view of views ?? PHX::View<panzer::GlobalOrdinal*>
+//buildCellOneRingsForAllCells(const Teuchos::RCP<const Teuchos::Comm<int> > & comm,
+//                             PHX::View<const panzer::GlobalOrdinal*> cells,
+//                             PHX::View<const panzer::GlobalOrdinal**> cells_to_nodes)
+//{
+//
+//  PANZER_FUNC_TIME_MONITOR_DIFF("panzer_stk::buildCellOneRingsForAllcells",??);
+//  typedef Tpetra::CrsMatrix<int,int,panzer::GlobalOrdinal,panzer::TpetraNodeType> crs_type;
+//
+//  // cells : (local cell index) -> global cell index
+//  // cells_to_nodes : (local cell index, local node_index) -> global node index
+//
+//  // the node to cell matrix: Row = Global Node Id, Cell = Global Cell Id, Value = Cell Local Node Id
+//  Teuchos::RCP<crs_type> node_to_cell = buildNodeToCellMatrix(comm,cells,cells_to_nodes);
+//
+//  //  
+//  std::unordered_set<panzer::GlobalOrdinal> owned_cell_gids;
+//
+//  // save gids of owned cells
+//  auto cells_h = Kokkos::create_mirror_view(cells);
+//  Kokkos::deep_copy(cells_h, cells);
+//  for(size_t i=0;i<cells.extent(0);i++) {
+//    owned_cell_gids.insert(cells_h(i));
+//  }
+//
+//  // Get a list of cell gids from the node_to_cell mapping
+//  auto cell_map = node_to_cell->getColMap()->getMyGlobalIndices();
+//
+//  // Iterate through the global node indexes associated with this process
+//  for(size_t i=0;i<cell_map.extent(0);i++) {
+//    const panzer::GlobalOrdinal global_cell_index = cell_map(i);
+//    size_t numEntries = node_to_cell->getNumEntriesInGlobalRow(cell_map(i));
+//    typename crs_type::nonconst_global_inds_host_view_type indices("indices", numEntries);
+//    typename crs_type::nonconst_values_host_view_type values("values", numEntries);
+//
+//    // Copy the column for a global node index into a local vector
+//    // TODO BWR CANT DO THIS
+//    node_to_cell->getGlobalRowCopy(global_node_index,indices,values,numEntries);
+//
+//    for(size_t j=0; j<indices.extent(0); ++j) {
+//      auto index = indices(j);
+//      // if this is a new index (not owned, not previously found ghstd index
+//      // add it to the list of ghstd cells
+//      if(unique_cells.find(index)==unique_cells.end()) {
+//        ghstd_cells_set.insert(index);
+//        unique_cells.insert(index); // make sure you don't find it again
+//      }
+//    }
+//  }
+//
+//  // build an array containing only the ghstd cells
+//  int indx = 0;
+//  PHX::View<panzer::GlobalOrdinal*> ghstd_cells("ghstd_cells",ghstd_cells_set.size());
+//  auto ghstd_cells_h = Kokkos::create_mirror_view(ghstd_cells);
+//  for(auto global_cell_index : ghstd_cells_set) {
+//    ghstd_cells_h(indx) = global_cell_index;
+//    indx++;
+//  }
+//
+////  print_view_1D("ghstd_cells",ghstd_cells);
+//  Kokkos::deep_copy(ghstd_cells, ghstd_cells_h);
+//  return ghstd_cells;
+//}
+
 }
 
 namespace partitioning_utilities

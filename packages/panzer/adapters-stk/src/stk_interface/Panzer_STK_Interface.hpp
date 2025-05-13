@@ -288,6 +288,10 @@ public:
      */
    void getNeighborElements(const std::string & blockID,std::vector<stk::mesh::Entity> & elements) const;
 
+   /** TODO BWR fill me out if we keep this
+    */
+   void getMyElementRings(std::vector<std::pair<stk::mesh::Entity,std::vector<stk::mesh::Entity>>> & rings) const;
+
    /** Get a vector of edges owned by this processor
      */
    void getMyEdges(std::vector<stk::mesh::Entity> & edges) const;
